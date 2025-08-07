@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bạn hỏi UTH trả lời</title>
+    <link rel="icon" type="image/jpg" href="favicon.jpg" />
+    {% comment %} <link rel="stylesheet" href="css.css" /> {% endcomment %}
+    <!-- <link rel="stylesheet" href="style2.css"> -->
+    <link rel="stylesheet" href="../../static/chat/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+
+    <meta name="google-signin-client_id" content="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com" />
+  </head>
+
+  <body>
+    <div class="sidebar">
+      <div class="sidebar-header">Chat UTH</div>
+      <!--  <div class="search-box">
+            <input type="text" id="searchChat" name="keyword" placeholder="Tìm đoạn chat...">
+        </div>  -->
+      <div class="search-box">
+        <form action="" method="GET">
+          <input type="text" name="keyword" placeholder="Tìm kiếm đoạn chat..." />
+          <button class="search-btn" type="submit"><i class="fas fa-search"></i></button>
+        </form>
+      </div>
+      <div class="chat-list" id="chatList">
+        <div class="chat-item">
+          <span class="chat-name" onclick="selectChat('Cuộc trò chuyện 1')">Cuộc trò chuyện 1</span>
+          <div class="chat-options">
+            <button class="menu-button" onclick="toggleMenu(this)">⋮</button>
+            <div class="dropdown-menu">
+              <div onclick="deleteThisChat(this)">🗑️ Xóa</div>
+            </div>
+          </div>
+        </div>
+        <div class="chat-item">
+          <span class="chat-name" onclick="selectChat('Cuộc trò chuyện 2')">Cuộc trò chuyện 2</span>
+          <div class="chat-options">
+            <button class="menu-button" onclick="toggleMenu(this)">⋮</button>
+            <div class="dropdown-menu">
+              <div onclick="deleteThisChat(this)">🗑️ Xóa</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="chat-actions">
+        <button onclick="addChat()">➕ Đoạn chat mới</button>
+      </div>
+      <div class="signin-container">
+        <div id="g_id_onload" data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
+        <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left"></div>
+      </div>
+      <!--  <div class="user-info" id="userInfo">
+            <div class="chat-options">
+                <button class="menu-button" onclick="toggleMenu(this)"><img id="userAvatar" src="favicon.jpg"
+                        alt="User Avatar"></button>
+                <div class="dropdown-menu">
+                    <div id="userName">User Name</div>
+                    <div onclick="logout()">Đăng xuất</div>
+                </div>
+            </div>
+        </div>  -->
+    </div>
+
+    <div class="chat-main">
+      <div class="midle">
+        <!-- <div class="chat-header" id="chatTitle">Chọn đoạn chat để bắt đầu</div> -->
+        <div class="content">
+          <div class="receive-messages" id="receiveMessages">
+            <div class="messages">Lorem, ipsum dolor Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sapiente, perspiciatis minus. Quam iste dolore, unde deserunt, repellat officiis quod sequi aperiam corrupti dolores optio. Consequatur quas inventore velit accusantium magni.</div>
+          </div>
+          <div class="sent-messages" id="sentMessages">
+            <div class="messages">Thank you for the information!</div>
+          </div>
+          <div class="receive-messages" id="sentMessages">
+            <div class="messages">Thank you for the information!</div>
+          </div>
+          <div class="sent-messages" id="sentMessages">
+            <div class="messages">Thank you for the information! Lorem ipsum dolor sit, amet consectetur adipisicing elit. A distinctio id adipisci, iste cupiditate provident, maxime blanditiis sunt, molestiae beatae error rem recusandae! Rerum maiores dolorum in inventore reprehenderit fugit?</div>
+          </div>
+          <div class="receive-messages" id="sentMessages">
+            <div class="messages">Thank you for the information!</div>
+          </div>
+          <div class="receive-messages" id="receiveMessages">
+            <div class="messages">Lorem, ipsum dolor Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sapiente, perspiciatis minus. Quam iste dolore, unde deserunt, repellat officiis quod sequi aperiam corrupti dolores optio. Consequatur quas inventore velit accusantium magni.</div>
+          </div>
+          <div class="sent-messages" id="sentMessages">
+            <div class="messages">Thank you for the information!</div>
+          </div>
+          <div class="receive-messages" id="sentMessages">
+            <div class="messages">Thank you for the information!</div>
+          </div>
+          <div class="sent-messages" id="sentMessages">
+            <div class="messages">Thank you for the information! Lorem ipsum dolor sit, amet consectetur adipisicing elit. A distinctio id adipisci, iste cupiditate provident, maxime blanditiis sunt, molestiae beatae error rem recusandae! Rerum maiores dolorum in inventore reprehenderit fugit?</div>
+          </div>
+          <div class="receive-messages" id="sentMessages">
+            <div class="messages">Thank you for the information!</div>
+          </div>
+        </div>
+        <div class="chat-input-container">
+          <form class="chat-input" onsubmit="sendMessage(event)">
+            <input type="text" id="userInput" placeholder="Nhập câu hỏi..." />
+            <button type="submit">Gửi</button>
+          </form>
+          <div style="font-size: 12px; text-align: center;">ChatUTH có thể mắc lỗi. Hãy kiểm tra các thông tin quan trọng.</div>
+        </div>
+      </div>
+      <div class="generated-links">
+        <!-- <p>Generated Links of Websites and Documents will appear here</p> -->
+        <ul id="linksList">
+          <li>
+            <a href="#" onclick="openIframe('https://www.w3schools.com/django/django_create_app.php')">Văn phòng phẩm vawn phongf pham</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm</a>
+          </li>
+          <li>
+            <a href="https://www.w3schools.com/django/django_create_app.php" target="_blank">Example Link 2</a>
+          </li>
+          <li>
+            <a href="#" target="_blank">Example Link 3</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm vawn phongf pham</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm</a>
+          </li>
+          <li>
+            <a href="#" target="_blank">Example Link 2</a>
+          </li>
+          <li>
+            <a href="#" target="_blank">Example Link 3</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm vawn phongf pham</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm</a>
+          </li>
+          <li>
+            <a href="#" target="_blank">Example Link 2</a>
+          </li>
+          <li>
+            <a href="#" target="_blank">Example Link 3</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm vawn phongf pham</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm</a>
+          </li>
+          <li>
+            <a href="#" onclick="openIframe('http://localhost/Stationery-Store/trang-chu')">Văn phòng phẩm</a>
+          </li>
+          <li>
+            <a href="#" target="_blank">Example Link 2</a>
+          </li>
+          <li>
+            <a href="#" target="_blank">Example Link 3</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="iframe-overlay" id="iframeOverlay">
+      <div class="iframe-container">
+        <button class="close-btn" onclick="closeIframe()">✖</button>
+        <iframe id="iframePopup" src="" frameborder="0"></iframe>
+      </div>
+    </div>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="../../stactic/chat/javascript.js"></script>
+  </body>
+</html>
