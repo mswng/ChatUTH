@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bạn hỏi UTH trả lời</title>
+    <link rel="icon" type="image/jpg" href="favicon.jpg" />
+    {% comment %} <link rel="stylesheet" href="{% static 'chat/css/admin.css' %}" /> {% endcomment %}
+  </head>
+  <body>
+    {% comment %} <div class="admin-header">
+      <h1>Bảng Quản Trị</h1>
+      <p>
+        Xin chào, {{ user.username }} | <a href="{% url 'account_logout' %}">Đăng xuất</a>
+      </p>
+    </div> {% endcomment %}
+
+    <div class="admin-content">
+      <h2>Thêm URL</h2>
+      <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="name" placeholder="Tên URL" required />
+        <input type="url" name="url" placeholder="Nhập URL" required />
+        <button type="submit">Thêm</button>
+      </form>
+
+      <h2>Danh sách URL</h2>
+      <ul>
+        {% for item in urls %}
+          <li>
+            <a href="{{ item.url }}" target="_blank">{{ item.name }}</a> ({{ item.created_at|date:'d/m/Y H:i' }})
+          </li>
+          <div>
+            Chi tiết<pre>{{ item.content_json|safe }}</pre>
+          </div>
+        {% empty %}
+          <li>Chưa có URL nào.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </body>
+  {% comment %} <script src="{% static 'chat/js/script.js' %}"></script> {% endcomment %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Lấy tất cả thẻ <pre> chứa JSON
+      document.querySelectorAll('pre').forEach(function (pre) {
+        let raw = pre.textContent
+    
+        // Format: xuống dòng khi gặp }, hoặc {
+        let formatted = raw.replace(/,/g, ',\n')
+    
+        pre.textContent = formatted
+      })
+    })
+  </script>
+</html>

@@ -1,0 +1,24 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    padding: 0;
+}
+.admin-header {
+    background: #0f9d58;
+    color: white;
+    padding: 15px;
+}
+.admin-content {
+    padding: 20px;
+}
+form input, form button {
+    padding: 8px;
+    margin: 5px;
+}
+form button {
+    background: #0f9d58;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
