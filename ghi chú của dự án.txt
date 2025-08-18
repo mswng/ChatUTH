@@ -1,6 +1,6 @@
 RAG: truy vấn tài liệu + sinh câu trả lời bằng LLM
 Retrieval: Phân tích, truy suất
-Flask là bộ xương sống server của chatbot bạn đang làm.
+Djangolà bộ xương sống server của chatbot bạn đang làm.
 Pipeline là một chuỗi các bước được thực hiện theo thứ tự, mỗi bước xử lý một phần dữ liệu đầu vào và truyền kết quả cho bước tiếp theo.
 
 Công nghệ sử dụng:
@@ -8,7 +8,8 @@ Lưu dữ liệu vào pdfblumber
 (Trích xuất dữ liệu từ PDF	Dùng pdfplumber nếu có bảng, PyMuPDF nếu cần tốc độ
 Trích xuất dữ liệu từ DOCX	Dùng docx2txt hoặc python-docx)
 
-SentenceTransformers: Biến văn bản thành vector (embedding)
+Embedding là một kỹ thuật đưa một vector có số chiều lớn, thường ở dạng thưa, về một vector có số chiều nhỏ, thường ở dạng dày đặc.
+Sentence Transformers: tạo embedding cho câu hoặc đoạn văn.
 
 LangChain – Framework xử lý RAG + LLM
 Mục đích: LangChain giúp xây dựng pipeline AI gồm:
@@ -32,7 +33,7 @@ FAISS/Chorma dùng để truy vấn tài liệu thật
 |     Tài liệu học tập      | ← PDF, slide, câu hỏi cũ
 +----------------------------+
             ↓
-     [Chunking + Embedding]
+     [Chunking + Embedding ()]
             ↓
 +----------------------------+
 |   Vector Database (FAISS) | ← dùng để truy xuất nhanh
@@ -66,4 +67,51 @@ FAISS/Chorma dùng để truy vấn tài liệu thật
 
 
 
+Gợi ý kiến trúc nếu kết hợp Django + LangChain + FAISS
+Django: xử lý HTTP request, API, giao diện web.
 
+LangChain: xử lý AI pipeline (embedding, lưu/tìm vector, query LLM).
+
+FAISS: lưu trữ index vector (local).
+
+Flow:
+
+Người dùng gửi câu hỏi qua form/chatbox (Django View).
+
+Django gọi hàm LangChain để:
+
+	Tạo embedding câu hỏi.
+
+	Tìm kiếm vector trong FAISS.
+
+	Gửi dữ liệu liên quan cho LLM.
+
+Trả kết quả lại cho frontend.
+
+
+
+
+API của Groq & Together.ai (miễn phí)
+Groq và Together.ai là các công ty cung cấp hạ tầng AI (hosting mô hình như LLaMA 3) và cho phép gọi qua API.
+
+Khi dùng API:
+
+Bạn không tải mô hình về máy, nghĩa là không tốn RAM máy tính.
+
+Mọi xử lý được chạy trên server của họ → bạn chỉ cần kết nối Internet.
+
+Miễn phí hay không? Cả Groq và Together.ai hiện đang cho Free Tier (gói miễn phí) với giới hạn số token/tháng.
+
+Ví dụ (số liệu gần đây, có thể thay đổi):
+
+	Groq: LLaMA 3 70B và 8B, miễn phí ~30–40K token/ngày.
+
+	Together.ai: Miễn phí ~100K token/ngày cho tài khoản mới, hỗ trợ LLaMA 3 và các model khác.
+
+
+
+
+
+
+
+	Sau khi hết quota, bạn phải trả phí hoặc chờ reset quota miễn phí.

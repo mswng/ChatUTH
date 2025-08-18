@@ -58,3 +58,7 @@ def add_crawled_page(request):
     urls = CrawledPage.objects.order_by("-crawled_at")
     # logger.error(f"thong tin cua url {urls}")
     return render(request, 'chat/admin.html', {"urls": urls})
+
+
+def quanLi(request):
+    return render(request, 'chat/dashboard.html')
