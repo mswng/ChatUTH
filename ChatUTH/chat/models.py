@@ -16,18 +16,19 @@ class GeneralInfo(models.Model):
 
 # Bảng lưu thông tin tuyển sinh (thay đổi mỗi năm)
 class AdmissionInfo(models.Model):
-    YEAR_CHOICES = [(str(y), str(y)) for y in range(2000, 2100)]
+    YEAR_CHOICES = [(str(y), str(y)) for y in range(2020, 2100)]
 
     year = models.CharField(max_length=4, choices=YEAR_CHOICES)  # Năm ra thông báo
-
-    PROGRAM_CHOICES = [
-        ("regular", "Hệ chính quy"),
-        ("part_time", "Hệ vừa học vừa làm"),
-        ("postgraduate", "Sau đại học"),
-        ("international", "Liên kết quốc tế"),
-        ("high_quality", "Đào tạo chất lượng cao"),
-    ]
-    program_type = models.CharField(max_length=50, choices=PROGRAM_CHOICES)  # Loại chương trình
+    title = models.CharField(max_length=255)  # Tiêu đề
+    
+    # PROGRAM_CHOICES = [
+    #     ("regular", "Hệ chính quy"),
+    #     ("part_time", "Hệ vừa học vừa làm"),
+    #     ("postgraduate", "Sau đại học"),
+    #     ("international", "Liên kết quốc tế"),
+    #     ("high_quality", "Đào tạo chất lượng cao"),
+    # ]
+    # program_type = models.CharField(max_length=50, choices=PROGRAM_CHOICES)  # Loại chương trình
 
     description = models.TextField()  # Nội dung chi tiết (đã làm sạch)
     url = models.URLField(blank=True, null=True)  # Link đến thông báo chính thức
