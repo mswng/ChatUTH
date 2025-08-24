@@ -1,0 +1,117 @@
+RAG: truy vấn tài liệu + sinh câu trả lời bằng LLM
+Retrieval: Phân tích, truy suất
+Djangolà bộ xương sống server của chatbot bạn đang làm.
+Pipeline là một chuỗi các bước được thực hiện theo thứ tự, mỗi bước xử lý một phần dữ liệu đầu vào và truyền kết quả cho bước tiếp theo.
+
+Công nghệ sử dụng:
+Lưu dữ liệu vào pdfblumber 
+(Trích xuất dữ liệu từ PDF	Dùng pdfplumber nếu có bảng, PyMuPDF nếu cần tốc độ
+Trích xuất dữ liệu từ DOCX	Dùng docx2txt hoặc python-docx)
+
+Embedding là một kỹ thuật đưa một vector có số chiều lớn, thường ở dạng thưa, về một vector có số chiều nhỏ, thường ở dạng dày đặc.
+Sentence Transformers: tạo embedding cho câu hoặc đoạn văn.
+
+LangChain – Framework xử lý RAG + LLM
+Mục đích: LangChain giúp xây dựng pipeline AI gồm:
+Truy vấn thông tin từ dữ liệu thật (retriever)
+Chuyển thông tin + câu hỏi vào LLM để tạo câu trả lời chính xác hơn
+Trong đề tài bạn:
+Dùng LangChain để kết nối giữa: 
+dữ liệu tài liệu → FAISS → LLaMA3 (Meta) → trả lời.
+
+SentenceTransformers: Biến câu hỏi thành vector (embedding)
+
+
+
+dùng requests + BeautifulSoup lấy dữ liệu từ trang web ->chuyển văn bản thành vector(SentenceTransformers) -> người dùng nhập câu hỏi(frontend nhập input rồi backend xử lí)(html, css, js) -> chuyển câu hỏi thành vector(SentenceTransformers) -> truy vấn trong csdl(FAISS) -> Tổng hợp các đoạn liên quan + câu hỏi -> dùng LLM sinh câu trả lời.(LLaMA3 (Meta)) -> trả về cho frontend
+
+
+FAISS/Chorma dùng để truy vấn tài liệu thật
+
+
++----------------------------+
+|     Tài liệu học tập      | ← PDF, slide, câu hỏi cũ
++----------------------------+
+            ↓
+     [Chunking + Embedding ()]
+            ↓
++----------------------------+
+|   Vector Database (FAISS) | ← dùng để truy xuất nhanh
++----------------------------+
+            ↓
+   +----------------------+
+   |     Mô hình LLM      | ← GPT, Mistral, v.v
+   +----------------------+
+            ↓
++-------------------------------+
+|     Phản hồi trả lời (chat)   |
++-------------------------------+
+ 
+
+
+## 📌 Gợi ý chia thời gian
+
+| Thời gian (tuần) | Người 1 (AI & backend)                                                  | Người 2 (Web & frontend)                 |
+| ---------------- | ----------------------------------------------------------------------- | ---------------------------------------- |
+| Tuần 1           | Setup Django ,Crawl dữ liệu(Lấy dữ liệu từ URL lưu vào csdl) + làm sạch | Tạo giao diện mẫu, tìm URL(dữ liệu)      |
+| Tuần 2           | Vector hóa + FAISS + LLM trả lời                                        | Kết nối giao diện với chatbot            |
+| Tuần 3           | Tối ưu pipeline + tài liệu hoá                                          | Bổ sung tính năng, làm đẹp UI            |
+
+
+
+| Thành viên | Phụ trách chính                                                        |
+| ---------- | ---------------------------------------------------------------------- |
+| Bạn 1      | `document`, `chatbot`, setup FAISS, LangChain                          |
+| Bạn 2      | `users`, `core`, giao diện, phần quản lý người dùng và frontend Django |
+
+
+
+
+Gợi ý kiến trúc nếu kết hợp Django + LangChain + FAISS
+Django: xử lý HTTP request, API, giao diện web.
+
+LangChain: xử lý AI pipeline (embedding, lưu/tìm vector, query LLM).
+
+FAISS: lưu trữ index vector (local).
+
+Flow:
+
+Người dùng gửi câu hỏi qua form/chatbox (Django View).
+
+Django gọi hàm LangChain để:
+
+	Tạo embedding câu hỏi.
+
+	Tìm kiếm vector trong FAISS.
+
+	Gửi dữ liệu liên quan cho LLM.
+
+Trả kết quả lại cho frontend.
+
+
+
+
+API của Groq & Together.ai (miễn phí)
+Groq và Together.ai là các công ty cung cấp hạ tầng AI (hosting mô hình như LLaMA 3) và cho phép gọi qua API.
+
+Khi dùng API:
+
+Bạn không tải mô hình về máy, nghĩa là không tốn RAM máy tính.
+
+Mọi xử lý được chạy trên server của họ → bạn chỉ cần kết nối Internet.
+
+Miễn phí hay không? Cả Groq và Together.ai hiện đang cho Free Tier (gói miễn phí) với giới hạn số token/tháng.
+
+Ví dụ (số liệu gần đây, có thể thay đổi):
+
+	Groq: LLaMA 3 70B và 8B, miễn phí ~30–40K token/ngày.
+
+	Together.ai: Miễn phí ~100K token/ngày cho tài khoản mới, hỗ trợ LLaMA 3 và các model khác.
+
+
+
+
+
+
+
+	Sau khi hết quota, bạn phải trả phí hoặc chờ reset quota miễn phí.

@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UTH Chatbot – Admin</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #2563eb;
+      --primary-600: #1d4ed8;
+      --danger: #dc2626;
+      --success: #16a34a;
+      --warning: #d97706;
+      --border: #e5e7eb;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font: 14px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    .layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+    /* Sidebar */
+    .sidebar { background: #0f172a; color: #e5e7eb; padding: 22px 14px; }
+    .brand { display:flex; align-items:center; gap:10px; padding: 8px 12px; }
+    .brand-logo { width: 32px; height: 32px; border-radius: 8px; background:#1e293b; display:grid; place-items:center; font-weight:700; }
+    .brand h1 { font-size: 14px; letter-spacing:.2px; margin:0; }
+    .nav { margin-top: 18px; }
+    .nav button {
+      width: 100%; text-align: left; background: transparent; color: #e5e7eb;
+      border: 0; padding: 12px 12px; border-radius: 10px; cursor: pointer;
+      display:flex; align-items:center; gap:10px; transition: .18s ease;
+    }
+    .nav button:hover { background: #111827; }
+    .nav button.active { background: #1f2937; }
+
+    /* Topbar */
+    .topbar { display:flex; align-items:center; justify-content:space-between; padding: 18px 22px; background: var(--card); border-bottom:1px solid var(--border); }
+    .topbar .right { display:flex; align-items:center; gap:10px; }
+    .chip { font-size:12px; color:#fff; background: var(--primary); padding:4px 10px; border-radius:999px; }
+    .btn { display:inline-flex; align-items:center; gap:8px; border:1px solid var(--border); background:#fff; padding:8px 12px; border-radius:10px; cursor:pointer; transition:.18s; }
+    .btn:hover { border-color:#cbd5e1 }
+    .btn.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .btn.primary:hover { background: var(--primary-600); }
+    .btn.ghost { background: transparent; border-color: transparent; color:#374151; }
+    .btn.danger { background: var(--danger); color:#fff; border-color: var(--danger); }
+
+    /* Main content */
+    .content { padding: 22px; }
+    .grid { display:grid; gap:18px; }
+    .card { background: var(--card); border:1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+    .card h2 { margin: 0 0 10px; font-size: 16px; }
+    .muted { color: var(--muted); }
+
+    /* Form */
+    .form { display:grid; gap: 12px; }
+    .row { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    label { font-weight:600; font-size:12px; color:#374151; }
+    input[type="text"], input[type="url"], input[type="number"], select, textarea {
+      width: 100%; border:1px solid var(--border); border-radius: 10px; padding:10px 12px; background:#fff; color:var(--text);
+    }
+    textarea { min-height: 130px; resize: vertical; }
+
+    /* Table */
+    .table-wrap { overflow:auto; border:1px solid var(--border); border-radius: 12px; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th { background:#f8fafc; text-align:left; font-size:12px; color:#475569; padding:10px 12px; position:sticky; top:0; z-index:1; border-bottom:1px solid var(--border); }
+    tbody td { padding:12px; border-bottom:1px solid var(--border); vertical-align: top; }
+    .actions { display:flex; gap:8px; }
+    .truncate-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient: vertical; overflow:hidden; }
+
+    /* Modal */
+    .modal { position: fixed; inset: 0; display: none; align-items:center; justify-content:center; background: rgba(15,23,42,.45); padding:20px; }
+    .modal.active { display: flex; }
+    .modal-card { background: var(--card); border:1px solid var(--border); border-radius: 14px; width: min(720px, 100%); padding:18px; }
+
+    /* Helpers */
+    .spacer { height: 8px; }
+    .small { font-size:12px; }
+    .source-tag { display:inline-flex; gap:6px; align-items:center; font-size:12px; padding:4px 8px; border-radius:999px; background:#eef2ff; color:#3730a3; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">UT</div>
+        <h1>UTH Chatbot Admin</h1>
+      </div>
+      <div class="nav">
+        <button class="active" data-tab="general">
+          🗂️ <span>Thông tin chung</span>
+        </button>
+        <button data-tab="admissions">
+          🎓 <span>Thông tin tuyển sinh</span>
+        </button>
+      </div>
+    </aside>
+
+    <main>
+      <div class="topbar">
+        <div class="left">
+          <strong>Bảng điều khiển</strong>
+          <span class="chip" title="Chỉ có 1 admin">Admin single-tenant</span>
+        </div>
+        <div class="right">
+          <button class="btn ghost" id="btnSyncChunks" title="Đẩy dữ liệu sang document_chunks">
+            ⛓️ Sync document_chunks
+          </button>
+          <button class="btn" id="btnExport" title="Xuất JSON để gọi API từ Django">⬇️ Export JSON</button>
+        </div>
+      </div>
+
+      <section class="content grid">
+        <!-- TAB: Thông tin chung -->
+        <div id="tab-general" class="card">
+          <h2>Thông tin chung (ít thay đổi)</h2>
+          <p class="muted small">Nhập thủ công hoặc dán URL nguồn (admin tự viết tiêu đề & mô tả đã làm sạch). Cột tiêu đề được xem như nhãn cho nội dung chi tiết.</p>
+
+          <div class="spacer"></div>
+
+          <form id="formGeneral" class="form" onsubmit="return false;">
+            <div class="row">
+              <div>
+                <label>Tiêu đề</label>
+                <input type="text" id="gTitle" placeholder="VD: Giới thiệu trường / Cơ sở Bình Thạnh / Hội đồng trường..." required />
+              </div>
+              <div>
+                <label>URL nguồn (tùy chọn)</label>
+                <input type="url" id="gUrl" placeholder="https://ut.edu.vn/..." />
+              </div>
+            </div>
+            <div>
+              <label>Mô tả chi tiết (đã làm sạch)</label>
+              <textarea id="gBody" placeholder="Nội dung đầy đủ, sạch, có thể dán từ URL sau khi xử lý..."></textarea>
+            </div>
+            <div class="row">
+              <div style="display:flex; gap:10px; align-items:center;">
+                <button class="btn" id="gParseUrl" type="button">🔗 Lấy nội dung từ URL (demo)</button>
+                <span class="muted small">* Demo client-side – khi tích hợp Django, gọi endpoint crawler để trích nội dung.</span>
+              </div>
+              <div style="text-align:right;">
+                <button class="btn primary" id="gAdd" type="button">➕ Thêm thông tin</button>
+              </div>
+            </div>
+          </form>
+
+          <div class="spacer"></div>
+
+          <div class="table-wrap">
+            <table id="tblGeneral">
+              <thead>
+                <tr>
+                  <th>Tiêu đề</th>
+                  <th>Nội dung chi tiết</th>
+                  <th>Thời gian chỉnh sửa</th>
+                  <th>Hành động</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Rows injected by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB: Thông tin tuyển sinh -->
+        <div id="tab-admissions" class="card" style="display:none;">
+          <h2>Thông tin tuyển sinh (theo năm)</h2>
+          <p class="muted small">Admin chọn <em>Chương trình đào tạo</em> từ danh mục cố định; có thể dán URL thông báo để trích nội dung chính rồi làm sạch và lưu.</p>
+
+          <div class="spacer"></div>
+
+          <form id="formAdmissions" class="form" onsubmit="return false;">
+            <div class="row">
+              <div>
+                <label>Năm</label>
+                <input type="number" id="aYear" min="2000" max="2100" placeholder="2025" required />
+              </div>
+              <div>
+                <label>Chương trình đào tạo</label>
+                <select id="aTrack" required>
+                  <option value="">-- Chọn chương trình --</option>
+                  <option>Chính quy</option>
+                  <option>Vừa học vừa làm</option>
+                  <option>Sau đại học – Thạc sĩ</option>
+                  <option>Sau đại học – Tiến sĩ</option>
+                  <option>Liên kết quốc tế</option>
+                  <option>Chất lượng cao</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div>
+                <label>URL thông báo (tùy chọn)</label>
+                <input type="url" id="aUrl" placeholder="https://ut.edu.vn/..." />
+              </div>
+              <div>
+                <label>Tiêu đề URL (hiển thị cho thí sinh)</label>
+                <input type="text" id="aUrlTitle" placeholder="Thông báo tuyển sinh năm 2025" />
+              </div>
+            </div>
+            <div>
+              <label>Mô tả chi tiết (đã làm sạch)</label>
+              <textarea id="aBody" placeholder="Tóm tắt nội dung chính từ thông báo, học phí, chỉ tiêu, phương thức, mốc thời gian..."></textarea>
+            </div>
+            <div class="row">
+              <div style="display:flex; gap:10px; align-items:center;">
+                <button class="btn" id="aParseUrl" type="button">🔗 Lấy nội dung từ URL (demo)</button>
+                <span class="muted small">* Demo client-side – tích hợp crawler ở server để trích và clean.</span>
+              </div>
+              <div style="text-align:right;">
+                <button class="btn primary" id="aAdd" type="button">➕ Thêm thông tin tuyển sinh</button>
+              </div>
+            </div>
+          </form>
+
+          <div class="spacer"></div>
+
+          <div class="table-wrap">
+            <table id="tblAdmissions">
+              <thead>
+                <tr>
+                  <th>Năm</th>
+                  <th>Chương trình</th>
+                  <th>Mô tả chi tiết</th>
+                  <th>Ngày thêm</th>
+                  <th>Nguồn</th>
+                  <th>Hành động</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Rows injected by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal: Chỉnh sửa bản ghi (dùng chung) -->
+  <div id="modalEdit" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h2>Chỉnh sửa nội dung</h2>
+        <button class="btn" onclick="closeModal()">✖</button>
+      </div>
+      <form id="formEdit" class="form" onsubmit="return false;">
+        <input type="hidden" id="editType" />
+        <input type="hidden" id="editId" />
+        <div class="row" id="editRowTop" style="display:none;"></div>
+        <div>
+          <label>Nội dung chi tiết</label>
+          <textarea id="editBody"></textarea>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+          <button class="btn" onclick="closeModal()">Hủy</button>
+          <button class="btn primary" id="btnSaveEdit">💾 Lưu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ----------------------
+    // State (demo in-memory)
+    // ----------------------
+    const state = {
+      general: [], // {id, title, body, url, updatedAt}
+      admissions: [], // {id, year, track, body, url, urlTitle, createdAt}
+      idCounter: 1
+    };
+
+    // ----------------------
+    // Helpers
+    // ----------------------
+    const $ = (sel) => document.querySelector(sel);
+    const nowISO = () => new Date().toISOString();
+    const fmtDate = (iso) => new Date(iso).toLocaleString('vi-VN');
+    const snippet = (text, n=220) => (text || '').length > n ? text.slice(0,n) + '…' : (text || '');
+
+    function setActiveTab(tab) {
+      // toggle buttons
+      document.querySelectorAll('.nav button').forEach(b=>{
+        b.classList.toggle('active', b.dataset.tab === tab);
+      });
+      // toggle views
+      $('#tab-general').style.display = (tab === 'general') ? 'block' : 'none';
+      $('#tab-admissions').style.display = (tab === 'admissions') ? 'block' : 'none';
+    }
+
+    // Sidebar navigation
+    document.querySelectorAll('.nav button').forEach(btn=>{
+      btn.addEventListener('click', ()=> setActiveTab(btn.dataset.tab));
+    });
+
+    // ----------------------
+    // Render functions
+    // ----------------------
+    function renderGeneral() {
+      const tbody = $('#tblGeneral tbody');
+      tbody.innerHTML = state.general.map(row => `
+        <tr>
+          <td><strong>${escapeHtml(row.title)}</strong>${row.url ? ` <span class="source-tag" title="Nguồn"><span>URL</span>🔗</span>`: ''}</td>
+          <td><div class="truncate-2">${escapeHtml(snippet(row.body))}</div></td>
+          <td>${fmtDate(row.updatedAt)}</td>
+          <td class="actions">
+            <button class="btn" onclick="openEdit('general', ${row.id})">✏️ Sửa</button>
+            <button class="btn danger" onclick="delRow('general', ${row.id})">🗑️ Xóa</button>
+          </td>
+        </tr>`).join('');
+    }
+
+    function renderAdmissions() {
+      const tbody = $('#tblAdmissions tbody');
+      tbody.innerHTML = state.admissions.map(row => `
+        <tr>
+          <td>${row.year}</td>
+          <td>${escapeHtml(row.track)}</td>
+          <td><div class="truncate-2">${escapeHtml(snippet(row.body))}</div></td>
+          <td>${fmtDate(row.createdAt)}</td>
+          <td>${row.url ? `<a href="${escapeAttr(row.url)}" target="_blank">${escapeHtml(row.urlTitle || 'Nguồn')}</a>` : '<span class="muted small">—</span>'}</td>
+          <td class="actions">
+            <button class="btn" onclick="openEdit('admissions', ${row.id})">✏️ Sửa</button>
+            <button class="btn danger" onclick="delRow('admissions', ${row.id})">🗑️ Xóa</button>
+          </td>
+        </tr>`).join('');
+    }
+
+    // ----------------------
+    // Add handlers (General)
+    // ----------------------
+    $('#gParseUrl').addEventListener('click', async () => {
+      // DEMO: giả lập gọi crawler → điền textarea
+      // Thực tế: fetch('/api/extract', {method:'POST', body:JSON.stringify({url})})
+      const url = $('#gUrl').value.trim();
+      if(!url) { alert('Nhập URL trước đã nhé.'); return; }
+      $('#gBody').value = `Bản demo: đã trích nội dung chính từ URL\n${url}\n... (admin chỉnh tay để làm sạch trước khi lưu).`;
+    });
+
+    $('#gAdd').addEventListener('click', () => {
+      const title = $('#gTitle').value.trim();
+      const body = $('#gBody').value.trim();
+      const url = $('#gUrl').value.trim();
+      if(!title || !body) { alert('Vui lòng nhập Tiêu đề và Mô tả chi tiết.'); return; }
+      state.general.unshift({ id: state.idCounter++, title, body, url: url || null, updatedAt: nowISO() });
+      renderGeneral();
+      // reset
+      $('#gTitle').value = ''; $('#gBody').value=''; $('#gUrl').value='';
+    });
+
+    // ----------------------
+    // Add handlers (Admissions)
+    // ----------------------
+    $('#aParseUrl').addEventListener('click', () => {
+      const url = $('#aUrl').value.trim();
+      if(!url) { alert('Nhập URL thông báo trước nhé.'); return; }
+      $('#aBody').value = `Bản demo: tóm tắt nội dung từ thông báo\n${url}\n• Phương thức: ...\n• Học phí: ...\n• Mốc thời gian: ...\n(Admin hiệu chỉnh trước khi lưu)`;
+    });
+
+    $('#aAdd').addEventListener('click', () => {
+      const year = parseInt($('#aYear').value, 10);
+      const track = $('#aTrack').value.trim();
+      const body = $('#aBody').value.trim();
+      const url = $('#aUrl').value.trim();
+      const urlTitle = $('#aUrlTitle').value.trim();
+      if(!year || !track || !body) { alert('Vui lòng nhập Năm, Chương trình và Mô tả chi tiết.'); return; }
+      state.admissions.unshift({ id: state.idCounter++, year, track, body, url: url || null, urlTitle: urlTitle || null, createdAt: nowISO() });
+      renderAdmissions();
+      // reset
+      $('#aYear').value=''; $('#aTrack').value=''; $('#aBody').value=''; $('#aUrl').value=''; $('#aUrlTitle').value='';
+    });
+
+    // ----------------------
+    // Edit / Delete shared
+    // ----------------------
+    function openEdit(type, id) {
+      const isGeneral = type === 'general';
+      const list = isGeneral ? state.general : state.admissions;
+      const row = list.find(x=>x.id===id);
+      if(!row) return;
+      $('#editType').value = type;
+      $('#editId').value = id;
+
+      const editTop = $('#editRowTop');
+      editTop.innerHTML = '';
+      editTop.style.display = 'grid';
+
+      if(isGeneral){
+        editTop.innerHTML = `
+          <div>
+            <label>Tiêu đề</label>
+            <input type="text" id="editTitle" value="${escapeAttr(row.title)}" />
+          </div>
+          <div>
+            <label>URL nguồn</label>
+            <input type="url" id="editUrl" value="${escapeAttr(row.url||'')}" />
+          </div>`;
+      } else {
+        editTop.innerHTML = `
+          <div>
+            <label>Năm</label>
+            <input type="number" id="editYear" value="${escapeAttr(row.year)}" />
+          </div>
+          <div>
+            <label>Chương trình</label>
+            <select id="editTrack">
+              ${["Chính quy","Vừa học vừa làm","Sau đại học – Thạc sĩ","Sau đại học – Tiến sĩ","Liên kết quốc tế","Chất lượng cao"].map(v=>`<option ${v===row.track?'selected':''}>${v}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label>URL thông báo</label>
+            <input type="url" id="editUrl" value="${escapeAttr(row.url||'')}" />
+          </div>
+          <div>
+            <label>Tiêu đề URL</label>
+            <input type="text" id="editUrlTitle" value="${escapeAttr(row.urlTitle||'')}" />
+          </div>`;
+      }
+
+      $('#editBody').value = row.body || '';
+      openModal();
+    }
+
+    $('#btnSaveEdit').addEventListener('click', () => {
+      const type = $('#editType').value; const id = parseInt($('#editId').value,10);
+      const isGeneral = type === 'general';
+      const list = isGeneral ? state.general : state.admissions;
+      const row = list.find(x=>x.id===id);
+      if(!row) return;
+
+      if(isGeneral){
+        row.title = $('#editTitle').value.trim();
+        row.url = $('#editUrl').value.trim() || null;
+        row.body = $('#editBody').value.trim();
+        row.updatedAt = nowISO();
+        renderGeneral();
+      } else {
+        row.year = parseInt($('#editYear').value,10);
+        row.track = $('#editTrack').value.trim();
+        row.url = $('#editUrl').value.trim() || null;
+        row.urlTitle = $('#editUrlTitle').value.trim() || null;
+        row.body = $('#editBody').value.trim();
+        renderAdmissions();
+      }
+      closeModal();
+    });
+
+    function delRow(type, id){
+      if(!confirm('Xóa bản ghi này?')) return;
+      if(type==='general'){
+        state.general = state.general.filter(x=>x.id!==id);
+        renderGeneral();
+      } else {
+        state.admissions = state.admissions.filter(x=>x.id!==id);
+        renderAdmissions();
+      }
+    }
+
+    function openModal(){ $('#modalEdit').classList.add('active'); }
+    function closeModal(){ $('#modalEdit').classList.remove('active'); }
+
+    // ----------------------
+    // Export / Sync (demo)
+    // ----------------------
+    $('#btnExport').addEventListener('click', () => {
+      const payload = {
+        general: state.general,
+        admissions: state.admissions
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'uth_admin_export.json'; a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    $('#btnSyncChunks').addEventListener('click', () => {
+      // Ý tưởng: gửi danh sách {source, text} sang API /chunks/sync để tạo/ cập nhật document_chunks
+      // - General: source = row.url || `general:${row.title}`
+      // - Admissions: source = row.url || `admissions:${row.year}:${row.track}`
+      // - text = row.body
+      // Ở đây demo hiển thị JSON gửi đi.
+      const docs = [
+        ...state.general.map(r=>({ kind:'general', source: r.url || `general:${r.title}`, text: r.body })),
+        ...state.admissions.map(r=>({ kind:'admissions', source: r.url || `admissions:${r.year}:${r.track}` , text: r.body }))
+      ];
+      alert('Demo payload to /api/chunks/sync:\n' + JSON.stringify(docs.slice(0,5), null, 2) + (docs.length>5?'\n...':'') );
+    });
+
+    // ----------------------
+    // Seed demo data
+    // ----------------------
+    (function seed(){
+      state.general.push({
+        id: state.idCounter++,
+        title: 'Giới thiệu Trường Đại học Giao thông Vận tải TP.HCM',
+        body: 'UTH là cơ sở đào tạo đa ngành trong lĩnh vực giao thông vận tải, kỹ thuật, kinh tế và công nghệ thông tin... (mẫu)',
+        url: '',
+        updatedAt: nowISO()
+      });
+      state.general.push({
+        id: state.idCounter++,
+        title: 'Cơ sở Bình Thạnh',
+        body: 'Địa chỉ: 2 Võ Oanh, P.25, Q. Bình Thạnh, TP.HCM. Các khoa: ...',
+        url: 'https://ut.edu.vn',
+        updatedAt: nowISO()
+      });
+      renderGeneral();
+
+      state.admissions.push({
+        id: state.idCounter++, year: 2025, track: 'Chính quy',
+        body: 'Phương thức: THPT, học bạ, tuyển thẳng; chỉ tiêu dự kiến ...; mốc thời gian ...',
+        url: 'https://ut.edu.vn/thong-bao-tuyen-sinh-2025', urlTitle: 'Thông báo tuyển sinh 2025',
+        createdAt: nowISO()
+      });
+      state.admissions.push({
+        id: state.idCounter++, year: 2025, track: 'Chất lượng cao',
+        body: 'Học phí dự kiến ...; ngôn ngữ giảng dạy ...; chương trình ...',
+        url: '', urlTitle: '', createdAt: nowISO()
+      });
+      renderAdmissions();
+    })();
+
+    // ----------------------
+    // XSS-safe helpers
+    // ----------------------
+    function escapeHtml(str=''){
+      return String(str)
+        .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
+        .replaceAll('"','&quot;').replaceAll("'",'&#039;');
+    }
+    function escapeAttr(str=''){
+      return escapeHtml(str).replaceAll('"','&quot;');
+    }
+  </script>
+</body>
+</html>

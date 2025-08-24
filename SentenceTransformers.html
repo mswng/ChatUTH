@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>Tên Mô Hình</th>
+                <th>Kích Thước (Tham số)</th>
+                <th>Kích Thước Embedding</th>
+                <th>Tốc Độ Inference</th>
+                <th>Ghi Chú Hiệu Năng</th>
+                <th>Ngữ Cảnh Sử Dụng Điển Hình</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>all-MiniLM-L6-v2</td>
+                <td>~22M</td>
+                <td>384</td>
+                <td>Rất nhanh</td>
+                <td>Hiệu suất cân bằng tốt, điểm MTEB khá</td>
+                <td>Ứng dụng cần tốc độ, tài nguyên hạn chế, tìm kiếm/phân loại chung</td>
+            </tr>
+            <tr>
+                <td>paraphrase-mpnet-base-v2</td>
+                <td>~110M</td>
+                <td>768</td>
+                <td>Nhanh</td>
+                <td>Thường tốt hơn MiniLM trên nhiều tác vụ</td>
+                <td>Cần hiệu suất cao hơn, sẵn sàng chấp nhận mô hình lớn hơn</td>
+            </tr>
+            <tr>
+                <td>multi-qa-mpnet-base-dot-v1</td>
+                <td>~110M</td>
+                <td>768</td>
+                <td>Nhanh</td>
+                <td>Tối ưu cho QA và tìm kiếm</td>
+                <td>Hệ thống hỏi đáp, tìm kiếm ngữ nghĩa chính xác</td>
+            </tr>
+            <tr>
+                <td>paraphrase-multilingual-MiniLM-L12-v2</td>
+                <td>~110M</td>
+                <td>384</td>
+                <td>Tương đối nhanh</td>
+                <td>Hỗ trợ >100 ngôn ngữ, hiệu suất tốt trên các tác vụ đa ngôn ngữ</td>
+                <td>Ứng dụng cần xử lý văn bản nhiều ngôn ngữ</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+
+</html>

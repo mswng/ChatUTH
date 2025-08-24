@@ -1,0 +1,5 @@
+Thu thập yêu cầu → Xác định dữ liệu cần quản lý.
+Xác định thực thể (entities) và mối quan hệ (relationships) → Dùng sơ đồ ERD.
+Xác định thuộc tính (attributes) của từng thực thể.
+Chuẩn hóa dữ liệu (1NF → 2NF → 3NF …).
+Chuyển sang mô hình vật lý → Viết câu lệnh SQL tạo bảng, ràng buộc (constraint), khóa chính/khóa ngoại.
